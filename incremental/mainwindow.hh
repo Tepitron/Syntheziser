@@ -31,12 +31,18 @@ private:
     int shovelEfficiency;
     int MINRESNEXTSHOVEL;
     int MINRESNEXTWORKER;
+    int workerEfficiency;
     bool basicShovel;
     bool betterShovel;
+    int timerId;
 
     void raiseMinResNextShovel(int raiseTo);
     void updateShovelEfficiency();
     void updateWorkerRequiredResource();
     void reduceResources(int reducable);
+    void updateWorkerEfficiency();
+
+protected:
+    void timerEvent(QTimerEvent *event);
 };
 #endif // MAINWINDOW_HH

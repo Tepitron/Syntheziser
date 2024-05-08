@@ -1,6 +1,7 @@
 #include "mainwindow.hh"
 #include "ui_mainwindow.h"
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -9,13 +10,18 @@ MainWindow::MainWindow(QWidget *parent)
     MINRESNEXTSHOVEL = 20;
     MINRESNEXTWORKER = 50;
     shovelEfficiency = 1;
+    workerEfficiency = 0;
     basicShovel = false;
     betterShovel = false;
+
     ui->setupUi(this);
+
+    timerId = startTimer(1000);
 }
 
 MainWindow::~MainWindow()
 {
+    killTimer(timerId);
     delete ui;
 }
 
@@ -51,7 +57,8 @@ void MainWindow::on_buyShovelButton_clicked()
     }
 }
 
-void MainWindow::raiseMinResNextShovel(int raiseTo){
+void MainWindow::raiseMinResNextShovel(int raiseTo)
+{
     MINRESNEXTSHOVEL = raiseTo;
 }
 
@@ -65,10 +72,12 @@ void MainWindow::on_buyWorkerButton_clicked()
 {
     if (resourceCounter >= MINRESNEXTWORKER){
         updateWorkerRequiredResource();
+        updateWorkerEfficiency();
     }
 }
 
-void MainWindow::updateWorkerRequiredResource(){
+void MainWindow::updateWorkerRequiredResource()
+{
     reduceResources(MINRESNEXTWORKER);
     MINRESNEXTWORKER *= 1.20;
     QString workersRequired =
@@ -76,7 +85,23 @@ void MainWindow::updateWorkerRequiredResource(){
     ui->buyWorkerButton->setText(workersRequired);
 }
 
-void MainWindow::reduceResources(int reducable){
+void MainWindow::reduceResources(int reducable)
+{
     resourceCounter -= reducable;
     ui->gatheredLcdNumber->display(resourceCounter);
 }
+
+void MainWindow::updateWorkerEfficiency()
+{
+    ui->workerEfficiencyLabel_2->setVisible(true);
+    workerEfficiency++;
+    QString updatedEfficiency = QString("Worker efficiency : %1").arg(workerEfficiency);
+    ui->workerEfficiencyLabel_2->setText(updatedEfficiency);
+}
+
+void MainWindow::timerEvent(QTimerEvent *event)
+{
+    resourceCounter += workerEfficiency;
+    ui->gatheredLcdNumber->display(resourceCounter);
+}
+
